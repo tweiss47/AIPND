@@ -42,10 +42,11 @@ def main():
     in_arg = get_input_args()
     # check_command_line_arguments(in_arg)
 
-    # TODO: 3. Define get_pet_labels() function to create pet image labels by
+    # DONE: 3. Define get_pet_labels() function to create pet image labels by
     # creating a dictionary with key=filename and value=file label to be used
     # to check the accuracy of the classifier function
-    answers_dic = get_pet_labels()
+    answers_dic = get_pet_labels(in_arg.dir)
+    # check_creating_pet_image_labels(answers_dic)
 
     # TODO: 4. Define classify_images() function to create the classifier
     # labels with the classifier function uisng in_arg.arch, comparing the
@@ -118,7 +119,7 @@ def get_input_args():
     return parser.parse_args()
 
 
-def get_pet_labels():
+def get_pet_labels(image_dir):
     """
     Creates a dictionary of pet labels based upon the filenames of the image
     files. Reads in pet filenames and extracts the pet image labels from the
@@ -131,7 +132,27 @@ def get_pet_labels():
      petlabels_dic - Dictionary storing image filename (as key) and Pet Image
                      Labels (as value)
     """
-    pass
+    petlabels = {}
+    filenames = listdir(image_dir)
+    for filename in filenames:
+        petlabels[filename] = get_label_from_file_name(filename)
+    return petlabels
+
+
+def get_label_from_file_name(filename):
+    """
+    Convert a pet image file name into a label.
+        1. All lowercase letters
+        2. Blank space separating words
+        3. Strip whitespace from front and end
+    """
+    label = ""
+    words = filename.lower().split('_')
+    for word in words:
+        if word.isalpha():
+            label += word + ' '
+    label = label.strip()
+    return label
 
 
 def classify_images():
