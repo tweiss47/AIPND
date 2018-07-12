@@ -51,7 +51,8 @@ def main():
     # TODO: 4. Define classify_images() function to create the classifier
     # labels with the classifier function uisng in_arg.arch, comparing the
     # labels, and creating a dictionary of results (result_dic)
-    result_dic = classify_images()
+    result_dic = classify_images(in_arg.dir, answers_dic, in_arg.arch)
+    check_classifying_images(result_dic)
 
     # TODO: 5. Define adjust_results4_isadog() function to adjust the results
     # dictionary(result_dic) to determine if classifier correctly classified
@@ -155,7 +156,7 @@ def get_label_from_file_name(filename):
     return label
 
 
-def classify_images():
+def classify_images(images_dir, petlable_dic, model):
     """
     Creates classifier labels with classifier function, compares labels, and
     creates a dictionary containing both labels and comparison of them to be
@@ -180,7 +181,34 @@ def classify_images():
                     idx 2 = 1/0 (int)   where 1 = match between pet image and
                     classifer labels and 0 = no match between labels
     """
-    pass
+    results_dic = {}
+    for filename, label in petlable_dic.items():
+        classifier_label = classifier(images_dir + filename, model)
+        results_dic[filename] = [
+                label,
+                classifier_label,
+                1 if is_label_match(label, classifier_label) else 0]
+    return results_dic
+
+
+def is_label_match(pet_label, class_labels):
+    """
+    Does the pet_label match one of the class_labels?
+
+    class_lables are mixed case and comma separated. We have a match if the
+    pet_label matches from the start to end of one of the class_labels or matches
+    from the start of a word to the end of one of the class_lables
+
+    return True for a match, False otherwise
+    """
+    class_label_parts = class_labels.split(',')
+    for part in class_label_parts:
+        class_label = part.strip().lower()
+        index = class_label.find(pet_label)
+        if ((index == 0 and len(pet_label) == len(class_label)) or
+            (index > 0 and class_label[index - 1] == ' ' and len(pet_label) + index == len(class_label))):
+            return True
+    return False
 
 
 def adjust_results4_isadog():
