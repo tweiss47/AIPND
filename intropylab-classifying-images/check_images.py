@@ -48,17 +48,18 @@ def main():
     answers_dic = get_pet_labels(in_arg.dir)
     # check_creating_pet_image_labels(answers_dic)
 
-    # TODO: 4. Define classify_images() function to create the classifier
+    # DONE: 4. Define classify_images() function to create the classifier
     # labels with the classifier function uisng in_arg.arch, comparing the
     # labels, and creating a dictionary of results (result_dic)
     result_dic = classify_images(in_arg.dir, answers_dic, in_arg.arch)
-    check_classifying_images(result_dic)
+    # check_classifying_images(result_dic)
 
-    # TODO: 5. Define adjust_results4_isadog() function to adjust the results
+    # DONE: 5. Define adjust_results4_isadog() function to adjust the results
     # dictionary(result_dic) to determine if classifier correctly classified
     # images as 'a dog' or 'not a dog'. This demonstrates if the model can
     # correctly classify dog images as dogs (regardless of breed)
-    adjust_results4_isadog()
+    adjust_results4_isadog(result_dic, in_arg.dogfile)
+    # check_classifying_labels_as_dogs(result_dic)
 
     # TODO: 6. Define calculates_results_stats() function to calculate
     # results of run and puts statistics in a results statistics
@@ -184,6 +185,7 @@ def classify_images(images_dir, petlable_dic, model):
     results_dic = {}
     for filename, label in petlable_dic.items():
         classifier_label = classifier(images_dir + filename, model)
+        classifier_label = classifier_label.strip().lower()
         results_dic[filename] = [
                 label,
                 classifier_label,
@@ -195,15 +197,15 @@ def is_label_match(pet_label, class_labels):
     """
     Does the pet_label match one of the class_labels?
 
-    class_lables are mixed case and comma separated. We have a match if the
-    pet_label matches from the start to end of one of the class_labels or matches
+    class_lables are comma separated. We have a match if the pet_label
+    matches from the start to end of one of the class_labels or matches
     from the start of a word to the end of one of the class_lables
 
     return True for a match, False otherwise
     """
     class_label_parts = class_labels.split(',')
     for part in class_label_parts:
-        class_label = part.strip().lower()
+        class_label = part.strip()
         index = class_label.find(pet_label)
         if ((index == 0 and len(pet_label) == len(class_label)) or
             (index > 0 and class_label[index - 1] == ' ' and len(pet_label) + index == len(class_label))):
@@ -211,7 +213,7 @@ def is_label_match(pet_label, class_labels):
     return False
 
 
-def adjust_results4_isadog():
+def adjust_results4_isadog(results_dic, dogsfile):
     """
     Adjusts the results dictionary to determine if classifier correctly
     classified images 'as a dog' or 'not a dog' especially when not a match.
@@ -239,7 +241,19 @@ def adjust_results4_isadog():
     Returns:
            None - results_dic is mutable data type so no return needed.
     """
-    pass
+    # read the dognames from the file into a set
+    dognames = set()
+    with open(dogsfile, 'r') as f:
+        line = f.readline()
+        while line:
+            dognames.add(line.rstrip())
+            line = f.readline()
+
+    # update the results_dic with match data
+    for image_name, image_data in results_dic.items():
+        image_match = 1 if image_data[0] in dognames else 0
+        class_match = 1 if image_data[1] in dognames else 0
+        results_dic[image_name].extend([image_match, class_match])
 
 
 def calculates_results_stats():
