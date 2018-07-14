@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # */AIPND/intropylab-classifying-images/check_images.py
 #
-# TODO: 0. Fill in your information in the programming header below
+# DONE: 0. Fill in your information in the programming header below
 # PROGRAMMER:   Taylor Weiss
 # DATE CREATED: 07/09/208
 # REVISED DATE:
@@ -59,17 +59,17 @@ def main():
     # images as 'a dog' or 'not a dog'. This demonstrates if the model can
     # correctly classify dog images as dogs (regardless of breed)
     adjust_results4_isadog(result_dic, in_arg.dogfile)
-    check_classifying_labels_as_dogs(result_dic)
+    # check_classifying_labels_as_dogs(result_dic)
 
-    # TODO: 6. Define calculates_results_stats() function to calculate
+    # DONE: 6. Define calculates_results_stats() function to calculate
     # results of run and puts statistics in a results statistics
     # dictionary (results_stats_dic)
     results_stats_dic = calculates_results_stats(result_dic)
-    check_calculating_results(result_dic, results_stats_dic)
+    # check_calculating_results(result_dic, results_stats_dic)
 
-    # TODO: 7. Define print_results() function to print summary results,
+    # DONE: 7. Define print_results() function to print summary results,
     # incorrect classifications of dogs and breeds if requested.
-    print_results()
+    print_results(result_dic, results_stats_dic, in_arg.arch)
 
     # DONE: 1. Define end_time to measure total program runtime
     # by collecting end time
@@ -309,14 +309,14 @@ def calculates_results_stats(results_dic):
     results_stats['pct_correct_dogs'] = \
             n_correct_dogs * 100.0 / n_dogs_img if n_dogs_img else 0.0
     results_stats['pct_correct_notdogs'] = \
-            n_correct_not_dogs * 100.0 / (n_images - n_dogs_img) if n_images - n_dogs_img == 0 else 0.0
+            n_correct_not_dogs * 100.0 / (n_images - n_dogs_img) if n_images - n_dogs_img else 0.0
     results_stats['pct_correct_breed'] = \
             n_correct_breed * 100.0 / n_dogs_img if n_dogs_img else 0.0
 
     return results_stats
 
 
-def print_results():
+def print_results(results_dic, results_stats, model):
     """
     Prints summary results on the classification and then prints incorrectly
     classified dogs and incorrectly classified dog breeds if user indicates
@@ -338,15 +338,19 @@ def print_results():
                      and the value is the statistic's value
       model - pretrained CNN whose architecture is indicated by this parameter,
               values must be: resnet alexnet vgg (string)
-      print_incorrect_dogs - True prints incorrectly classified dog images and
-                             False doesn't print anything(default) (bool)
-      print_incorrect_breed - True prints incorrectly classified dog breeds and
-                              False doesn't print anything(default) (bool)
-    Returns:
+   Returns:
            None - simply printing results.
     """
-    pass
-
+    print("** Results for Architecture", model.upper())
+    print()
+    print("{:>28} : {:3d}".format("Image Count", results_stats['n_images']))
+    print("{:>28} : {:3d}".format("Dog Image Count", results_stats['n_dogs_img']))
+    print("{:>28} : {:3d}".format("Not Dog Image Count", results_stats['n_notdogs_img']))
+    print()
+    print("{:>28} : {:3.1f}".format("Percent Match", results_stats['pct_match']))
+    print("{:>28} : {:3.1f}".format("Percent Correct Dogs", results_stats['pct_correct_dogs']))
+    print("{:>28} : {:3.1f}".format("Perecent Correct Breed", results_stats['pct_correct_breed']))
+    print("{:>28} : {:3.1f}".format("Percent Correct Not Dogs", results_stats['pct_correct_notdogs']))
 
 
 # Call to main function to run the program
