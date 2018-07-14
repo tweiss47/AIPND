@@ -59,12 +59,13 @@ def main():
     # images as 'a dog' or 'not a dog'. This demonstrates if the model can
     # correctly classify dog images as dogs (regardless of breed)
     adjust_results4_isadog(result_dic, in_arg.dogfile)
-    # check_classifying_labels_as_dogs(result_dic)
+    check_classifying_labels_as_dogs(result_dic)
 
     # TODO: 6. Define calculates_results_stats() function to calculate
     # results of run and puts statistics in a results statistics
     # dictionary (results_stats_dic)
-    results_stats_dic = calculates_results_stats()
+    results_stats_dic = calculates_results_stats(result_dic)
+    check_calculating_results(result_dic, results_stats_dic)
 
     # TODO: 7. Define print_results() function to print summary results,
     # incorrect classifications of dogs and breeds if requested.
@@ -256,7 +257,7 @@ def adjust_results4_isadog(results_dic, dogsfile):
         results_dic[image_name].extend([image_match, class_match])
 
 
-def calculates_results_stats():
+def calculates_results_stats(results_dic):
     """
     Calculates statistics of the results of the run using classifier's model
     architecture on classifying images. Then puts the results statistics in a
@@ -280,7 +281,39 @@ def calculates_results_stats():
                      name (starting with 'pct' for percentage or 'n' for count)
                      and the value is the statistic's value
     """
-    pass
+    # tally all the data needed to compute the statistics
+    n_images = len(results_dic)
+    n_dogs_img = 0              # image a dog [3]
+    n_match = 0                 # labels match [2]
+    n_correct_dogs = 0          # image a dog [3] and class is a dog [4]
+    n_correct_not_dogs = 0      # not a dog ![3] and class is not a dog ![4]
+    n_correct_breed = 0         # labels match [2] and is a dog[3]
+
+    for _, result in results_dic.items():
+        n_dogs_img += result[3]
+        n_match += result[2]
+        n_correct_dogs += 1 if result[3] and result[4] else 0
+        n_correct_not_dogs += 1 if result[3] == 0 and result[4] == 0 else 0
+        n_correct_breed += 1 if result[2] and result[3] else 0
+
+    # compute the statistics
+    results_stats = {}
+
+    results_stats['n_images'] = n_images
+    results_stats['n_match'] = n_match
+    results_stats['n_dogs_img'] = n_dogs_img
+    results_stats['n_notdogs_img'] = n_images - n_dogs_img
+
+    results_stats['pct_match'] = \
+            n_match * 100.0 / n_images if n_images else 0.0
+    results_stats['pct_correct_dogs'] = \
+            n_correct_dogs * 100.0 / n_dogs_img if n_dogs_img else 0.0
+    results_stats['pct_correct_notdogs'] = \
+            n_correct_not_dogs * 100.0 / (n_images - n_dogs_img) if n_images - n_dogs_img == 0 else 0.0
+    results_stats['pct_correct_breed'] = \
+            n_correct_breed * 100.0 / n_dogs_img if n_dogs_img else 0.0
+
+    return results_stats
 
 
 def print_results():
